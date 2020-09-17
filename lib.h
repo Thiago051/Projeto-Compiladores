@@ -1,6 +1,6 @@
 /* Protótipos */
 
-/*1 Introdução*/
+/* 1 INTRODUÇÃO */
 void init();
 void nextChar();
 void error(char *fmt, ...);
@@ -11,5 +11,12 @@ char getName();
 char getNum();
 void emit(char *fmt, ...);
 
-
- 
+/* 2 Análise de Expressões */
+void term();
+void expression();
+void add();
+void subtract(); 
+void multiply();
+void divide();
+void factor();
+int isAddOp(char c);

@@ -6,6 +6,8 @@
 
 char look; /* O caracter lido "antecipadamente" (lookahead) */
 
+/****************************** 1 INTRODUÇÃO */
+
 /* inicialização do compilador */
 void init()
 {
@@ -110,4 +112,111 @@ void emit(char *fmt, ...)
     va_end(args);
 
     putchar('\n');
+}
+
+/****************************** 2 Análise de Expressões */
+
+/* analisa e traduz um fator */
+void factor()
+{
+    if (look == '(')
+    {
+        match('(');
+        expression();
+        match(')');
+    }
+    else
+        emit("MOV AX, %c", getNum());
+}
+
+/* analisa e traduz um termo */
+void term()
+{
+    factor();
+    while (look == '*' || look == '/')
+    {
+        emit("PUSH AX");
+        switch (look)
+        {
+        case '*':
+            multiply();
+            break;
+        case '/':
+            divide();
+            break;
+        default:
+            expected("MulOp");
+            break;
+        }
+    }
+}
+
+/* reconhece e traduz uma adição */
+void add()
+{
+    match('+');
+    term();
+    emit("POP BX");
+    emit("ADD AX, BX");
+}
+
+/* reconhece e traduz uma subtração */
+void subtract()
+{
+    match('-');
+    term();
+    emit("POP BX");
+    emit("SUB AX, BX");
+    emit("NEG AX");
+}
+
+/* reconhece e traduz uma multiplicação */
+void multiply()
+{
+    match('*');
+    factor();
+    emit("POP BX");
+    emit("IMUL BX");
+}
+
+/* reconhece e traduz uma divisão */
+void divide()
+{
+    match('/');
+    factor();
+    emit("POP BX");
+    emit("XCHG AX, BX");
+    emit("CWD");
+    emit("IDIV BX");
+}
+
+/* reconhece e traduz uma expressão */
+void expression()
+{
+    if (isAddOp(look))
+        emit("XOR AX, AX");
+    else
+        term();
+    while (isAddOp(look))
+    {
+        emit("PUSH AX");
+        switch (look)
+        {
+        case '+':
+            add();
+            break;
+        case '-':
+            subtract();
+            break;
+        default:
+            expected("AddOp");
+            break;
+        }
+    }
+}
+
+/* reconhece operador aditivo */
+int isAddOp(char c)
+{
+    return (c == '+' || c == '-');
 }
