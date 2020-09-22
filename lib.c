@@ -4,14 +4,15 @@
 #include <ctype.h>
 #include "lib.h"
 
-char look; /* O caracter lido "antecipadamente" (lookahead) */
+//char look; /* O caracter lido "antecipadamente" (lookahead) */
 
-/****************************** 1 INTRODUÇÃO */
+/********** 1 Introdução **********/
 
 /* inicialização do compilador */
 void init()
 {
     nextChar();
+    skipWhite();
 }
 
 /* lê próximo caracter da entrada */
@@ -72,32 +73,41 @@ void match(char c)
     if (look != c)
         expected("'%c'", c);
     nextChar();
+    skipWhite();
 }
 
 /* recebe o nome de um identificador */
-char getName()
+void getName(char *name)
 {
-    char name;
-
+    int i;
     if (!isalpha(look))
         expected("Name");
-    name = toupper(look);
-    nextChar();
-
-    return name;
+    for (i = 0; isalnum(look); i++)
+    {
+        if (i >= MAXNAME)
+            fatal("Identifier too long!");
+        name[i] = toupper(look);
+        nextChar();
+    }
+    name[i] = '\0';
+    skipWhite();
 }
 
 /* recebe um número inteiro */
-char getNum()
+void getNum(char *num)
 {
-    char num;
-
+    int i;
     if (!isdigit(look))
         expected("Integer");
-    num = look;
-    nextChar();
-
-    return num;
+    for (i = 0; isdigit(look); i++)
+    {
+        if (i >= MAXNUM)
+            fatal("Integer too long!");
+        num[i] = look;
+        nextChar();
+    }
+    num[i] = '\0';
+    skipWhite();
 }
 
 /* emite uma instrução seguida por uma nova linha */
@@ -114,19 +124,27 @@ void emit(char *fmt, ...)
     putchar('\n');
 }
 
-/****************************** 2 Análise de Expressões */
+/********** 2 Análise de Expressões **********/
 
 /* analisa e traduz um fator */
 void factor()
 {
+    char num[MAXNUM + 1];
     if (look == '(')
     {
         match('(');
         expression();
         match(')');
     }
+    else if (isalpha(look))
+    {
+        ident();
+    }
     else
-        emit("MOV AX, %c", getNum());
+    {
+        getNum(num);
+        emit("MOV AX, %s", num);
+    }
 }
 
 /* analisa e traduz um termo */
@@ -220,3 +238,39 @@ int isAddOp(char c)
 {
     return (c == '+' || c == '-');
 }
+
+/********** 3 Mais expressões **********/
+
+/* analisa e traduz um identificador */
+void ident()
+{
+    char name[MAXNAME + 1];
+    getName(name);
+    if (look == '(')
+    {
+        match('(');
+        match(')');
+        emit("CALL %s", name);
+    }
+    else
+        emit("MOV AX, [%s]", name);
+}
+
+/* analisa e traduz um comando de atribuição */
+void assignment()
+{
+    char name[MAXNAME + 1];
+    getName(name);
+    match('=');
+    expression();
+    emit("MOV [%s], AX", name);
+}
+
+/* pula caracteres de espaço */
+void skipWhite()
+{
+    while (look == ' ' || look == '\t')
+        nextChar(); 
+}
+
+/********** 4 Interpretadores **********/

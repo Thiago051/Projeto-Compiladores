@@ -13,7 +13,10 @@
 int main()
 {
     init();
-    expression();
+    //expression();
+    assignment();
+    if (look != '\n')
+            expected("NewLine");
     
     return 0;
 }
