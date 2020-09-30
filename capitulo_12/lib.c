@@ -19,7 +19,7 @@ void init()
 }
 
 /* lê próximo caracter da entrada em lookahead */
-void nextchar_x() /**************************************************/
+void nextchar_x() /************ void nextchar() */
 {
     look = getchar();
 }
@@ -795,36 +795,21 @@ void statement()
 /* pula um campo de comentário */
 void skipcomment()
 {
-
-    do
+    while (look != '}')
     {
-        nextchar_x();
-
-    } while (look != '\n');
+        nextchar();
+        
+        if (look == '{') /* trata comentários aninhados */
+            skipcomment();
+    }
 
     nextchar();
 }
 
-/* lê próximo caracter e intercepta início de comentário*/
-char tempchar = ' ';
+/* lê próximo caracter da entrada e pula quaisquer comentários */
 void nextchar()
 {
-    if (tempchar != ' ')
-    {
-        look = tempchar;
-        tempchar = ' ';
-    }
-    else
-    {
-        nextchar_x();
-        if (look == '/')
-        {
-            tempchar = getchar();
-            if (tempchar == '*')
-            {
-                look = '{';
-                tempchar = ' ';
-            }
-        }
-    }
+    nextchar_x();
+    if (look == '{')
+        skipcomment();
 }

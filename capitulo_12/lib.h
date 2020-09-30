@@ -30,7 +30,7 @@ char value[MAXTOKEN+1]; /* texto do token atual */
 /* PROTÓTIPOS */
 /* rotinas utilitárias */
 void init();
-void nextchar(); /**/ void nextchar_x();
+void nextchar(); /************/ void nextchar_x();
 void error(char *s);
 void fatal(char *s);
 void expected(char *s);
@@ -59,8 +59,7 @@ void getop();
 void nexttoken();
 void scan();
 void matchstring(char *s);
-void semicolon();/* */
-void skipcomment();/* */
+void skipcomment();/**/
 
 /* rótulos */
 int newlabel();
@@ -100,6 +99,7 @@ void term();
 void add();
 void subtract();
 void expression();
+void semicolon();/**/
 
 /* expressões booleanas e relações */
 void relation();
@@ -118,7 +118,7 @@ void doread();
 void writevar();
 void dowrite();
 void block();
-void statement();/**/
+void statement(); /**/
 
 /* declarações */
 void decl();
