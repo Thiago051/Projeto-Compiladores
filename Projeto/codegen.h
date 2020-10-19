@@ -1,0 +1,25 @@
+/* rotinas de geração de código */
+void asm_clear();
+void asm_negative();
+void asm_loadconst(char *name);
+void asm_loadvar(char *name);
+void asm_push();
+void asm_popadd();
+void asm_popsub();
+void asm_popmul();
+void asm_popdiv();
+void asm_store(char *name);
+void asm_not();
+void asm_popand();
+void asm_popor();
+void asm_popxor();
+void asm_popcompare();
+void asm_relop(char op);
+void asm_jmp(int label);
+void asm_jmpfalse(int label);
+void asm_read();
+void asm_write();
+void header();
+void prolog();
+void epilog();
+void allocvar(char *name, int value);
